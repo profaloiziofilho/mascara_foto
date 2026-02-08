@@ -113,7 +113,7 @@
     document.getElementById('download').onclick = () => {
       const link = document.createElement('a');
       link.download = 'foto_com_mascara.png';
-      link.href = canvas.toDataURL();
+      link.href = canvas.toDataURL({ format: 'jpg', multiplier: 2 // dobra a resolução });
       link.click();
     };
 
@@ -121,3 +121,4 @@
   </script>
 </body>
 </html>
+
