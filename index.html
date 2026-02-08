@@ -32,7 +32,11 @@
           img.set({
             left: 100,
             top: 100,
-            selectable: true
+            selectable: true,
+            hasControls: true,   // mantém controles de redimensionamento
+            cornerColor: 'red',  // cor das alças
+            cornerSize: 15,      // tamanho das alças
+            transparentCorners: false
           });
           img.scaleToWidth(300); // tamanho inicial
           canvas.add(img);
@@ -52,4 +56,5 @@
   </script>
 </body>
 </html>
+
 
