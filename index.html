@@ -2,59 +2,47 @@
 <html>
 <head>
   <title>Aplicar Máscara</title>
-  <style>
-    body { font-family: Arial; text-align: center; width: 100%; }
-    canvas { border: 1px solid #ccc; margin-top: 10px; }
-  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.2.4/fabric.min.js"></script>
 </head>
 <body>
   <h2>Adicione uma máscara à sua foto</h2>
   <input type="file" id="upload" accept="image/*"><br><br>
-
-  <label for="maskSelect">Escolha a máscara:</label>
-  <select id="maskSelect">
-    <option value="mask_open.png">#OpenToWork</option>
-    <option value="mask_hiring.png">#Contratando</option>
-    <option value="mask_event.png">#EventoEspecial</option>
-  </select><br><br>
-
-  <canvas id="canvas" style="width: 50%;"></canvas><br>
+  <canvas id="canvas" width="600" height="600"></canvas><br>
   <button id="download">Baixar imagem</button>
 
   <script>
-    const upload = document.getElementById('upload');
-    const maskSelect = document.getElementById('maskSelect');
-    const canvas = document.getElementById('canvas');
-    const ctx = canvas.getContext('2d');
-    let currentImg = null;
+    const canvas = new fabric.Canvas('canvas');
+    let mask;
 
-    upload.onchange = e => {
-      const file = e.target.files[0];
+    // Carregar máscara fixa
+    fabric.Image.fromURL('mask_open.png', function(img) {
+      mask = img;
+      mask.selectable = false; // máscara não pode ser movida
+      mask.scaleToWidth(canvas.width);
+      mask.scaleToHeight(canvas.height);
+      canvas.add(mask);
+      canvas.sendToBack(mask);
+    });
+
+    // Upload da foto
+    document.getElementById('upload').onchange = function(e) {
       const reader = new FileReader();
-      reader.onload = event => {
-        const img = new Image();
-        img.onload = () => {
-          canvas.width = img.width;
-          canvas.height = img.height;
-          currentImg = img;
-          render();
-        };
-        img.src = event.target.result;
+      reader.onload = function(event) {
+        fabric.Image.fromURL(event.target.result, function(img) {
+          img.set({
+            left: 100,
+            top: 100,
+            selectable: true
+          });
+          img.scaleToWidth(300); // tamanho inicial
+          canvas.add(img);
+          canvas.bringToFront(mask); // máscara sempre na frente
+        });
       };
-      reader.readAsDataURL(file);
+      reader.readAsDataURL(e.target.files[0]);
     };
 
-    maskSelect.onchange = render;
-
-    function render() {
-      if (!currentImg) return;
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.drawImage(currentImg, 0, 0);
-      const mask = new Image();
-      mask.src = maskSelect.value;
-      mask.onload = () => ctx.drawImage(mask, 0, 0, canvas.width, canvas.height);
-    }
-
+    // Download da imagem final
     document.getElementById('download').onclick = () => {
       const link = document.createElement('a');
       link.download = 'foto_com_mascara.png';
