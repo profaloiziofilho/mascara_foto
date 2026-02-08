@@ -1,27 +1,81 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Aplicar Máscara</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.2.4/fabric.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 0;
+      padding: 1rem;
+    }
+    #canvas-container {
+      width: 100%;
+      max-width: 800px;
+      margin: auto;
+    }
+    canvas {
+      width: 100% !important;
+      height: auto !important;
+    }
+    label {
+      display: block;
+      margin-top: 1rem;
+      font-weight: bold;
+    }
+    button {
+      margin-top: 1rem;
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
-  <h2>Adicione uma máscara à sua foto</h2>
-  <input type="file" id="upload" accept="image/*"><br><br>
-  <canvas id="canvas" width="600" height="778"></canvas><br>
-  <button id="download">Baixar imagem</button>
+  <h1>Adicione uma máscara à sua foto</h1>
+
+  <label for="upload">Carregar foto:</label>
+  <input type="file" id="upload" accept="image/*" aria-label="Carregar foto para aplicar máscara">
+
+  <div id="canvas-container">
+    <canvas id="canvas"></canvas>
+  </div>
+
+  <button id="download" aria-label="Baixar imagem final">Baixar imagem</button>
 
   <script>
     const canvas = new fabric.Canvas('canvas');
     let mask;
 
+    // Ajusta o canvas mantendo proporção 600x778
+    function resizeCanvas() {
+      const container = document.getElementById('canvas-container');
+      const width = container.offsetWidth;
+      const height = Math.round(width * (778 / 600)); // proporção da máscara
+
+      canvas.setWidth(width);
+      canvas.setHeight(height);
+
+      if (mask) {
+        mask.scaleToWidth(canvas.width);
+        mask.scaleToHeight(canvas.height);
+        canvas.centerObject(mask);
+        canvas.renderAll();
+      }
+    }
+
+    window.addEventListener('resize', resizeCanvas);
+
     // Carregar máscara fixa
     fabric.Image.fromURL('mask_open.png', function(img) {
       mask = img;
-      mask.selectable = false; // máscara não pode ser movida
-      mask.scaleToWidth(canvas.width);
-      mask.scaleToHeight(canvas.height);
+      mask.selectable = false;
       canvas.add(mask);
-      canvas.sendToBack(mask);
+      resizeCanvas();
+      canvas.bringToFront(mask);
     });
 
     // Upload da foto
@@ -30,17 +84,26 @@
       reader.onload = function(event) {
         fabric.Image.fromURL(event.target.result, function(img) {
           img.set({
-            left: 100,
-            top: 100,
-            selectable: true,
-            hasControls: true,   // mantém controles de redimensionamento
-            cornerColor: 'red',  // cor das alças
-            cornerSize: 15,      // tamanho das alças
+            lockMovementX: false,
+            lockMovementY: false,
+            hasControls: true,
+            cornerColor: 'red',
+            cornerSize: 30,
             transparentCorners: false
           });
-          img.scaleToWidth(300); // tamanho inicial
+          img.scaleToWidth(canvas.width * 0.8);
+
+          // Recorte proporcional ao tamanho da máscara
+          img.clipPath = new fabric.Rect({
+            left: 0,
+            top: 0,
+            width: canvas.width,
+            height: canvas.height,
+            absolutePositioned: true
+          });
+
           canvas.add(img);
-          canvas.bringToFront(mask); // máscara sempre na frente
+          canvas.bringToFront(mask);
         });
       };
       reader.readAsDataURL(e.target.files[0]);
@@ -53,8 +116,8 @@
       link.href = canvas.toDataURL();
       link.click();
     };
+
+    resizeCanvas(); // chamada inicial
   </script>
 </body>
 </html>
-
-
