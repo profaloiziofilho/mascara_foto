@@ -62,14 +62,10 @@
       if (mask) {
   mask.scaleToWidth(canvas.width);
   mask.scaleToHeight(canvas.height);
-  mask.set({
-    originX: 'center',
-    originY: 'center',
-    left: canvas.width / 2,
-    top: canvas.height / 2
-  });
+  mask.set({ left: 0, top: 0 });
   canvas.renderAll();
 }
+
 
     }
 
@@ -144,4 +140,5 @@
   </script>
 </body>
 </html>
+
 
