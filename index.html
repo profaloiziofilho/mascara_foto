@@ -80,7 +80,6 @@
     fabric.Image.fromURL('1000480796.png', function(img) {
       mask = img;
       mask.selectable = false;
-      mask.set({ opacity: 0.5 }); // semi-transparente para ajuste
       canvas.add(mask);
       resizeCanvas();
       canvas.bringToFront(mask);
@@ -147,6 +146,7 @@
   </script>
 </body>
 </html>
+
 
 
 
