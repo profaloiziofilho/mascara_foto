@@ -141,11 +141,20 @@
       if (mask) mask.set({ opacity: 0.5 }); // volta semi-transparente para edição
       canvas.renderAll();
     };
+// Sempre que o usuário clicar no canvas
+canvas.on('mouse:down', function(e) {
+  // Se não clicou em nenhum objeto (e.target == null)
+  if (!e.target && mask) {
+    canvas.bringToFront(mask);
+    canvas.renderAll();
+  }
+});
 
     resizeCanvas(); // chamada inicial
   </script>
 </body>
 </html>
+
 
 
 
