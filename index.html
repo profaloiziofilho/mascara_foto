@@ -45,12 +45,14 @@
   <div id="canvas-container">
     <canvas id="canvas"></canvas>
   </div>
-<button id="finalizar" aria-label="Finalizar alterações">Finalizar alterações</button>
+
+  <button id="finalizar" aria-label="Finalizar alterações">Finalizar alterações</button>
   <button id="download" aria-label="Baixar imagem final">Baixar imagem</button>
 
   <script>
     const canvas = new fabric.Canvas('canvas');
     let mask;
+    let uploadedImage; // variável global para armazenar a foto
 
     // Ajusta o canvas mantendo proporção 1080x1350
     function resizeCanvas() {
@@ -80,6 +82,7 @@
     fabric.Image.fromURL('1000480796.png', function(img) {
       mask = img;
       mask.selectable = false;
+      mask.set({ opacity: 0.5 }); // semi-transparente para ajuste
       canvas.add(mask);
       resizeCanvas();
       canvas.bringToFront(mask);
@@ -90,6 +93,7 @@
       const reader = new FileReader();
       reader.onload = function(event) {
         fabric.Image.fromURL(event.target.result, function(img) {
+          uploadedImage = img;
           img.set({
             hasControls: true,
             cornerColor: 'red',
@@ -125,6 +129,18 @@
       reader.readAsDataURL(e.target.files[0]);
     };
 
+    // Botão Finalizar alterações
+    document.getElementById('finalizar').onclick = () => { 
+      if (uploadedImage) { 
+        uploadedImage.set({ selectable: false, hasControls: false }); 
+      }
+      if (mask) {
+        mask.set({ opacity: 1 }); // máscara opaca definitiva
+        canvas.bringToFront(mask);
+      }
+      canvas.renderAll();
+    };
+
     // Download da imagem final
     document.getElementById('download').onclick = () => {
       if (mask) mask.set({ opacity: 1 }); // máscara opaca no resultado
@@ -141,19 +157,8 @@
       if (mask) mask.set({ opacity: 0.5 }); // volta semi-transparente para edição
       canvas.renderAll();
     };
-// Sempre que o usuário clicar no canvas
-document.getElementById('finalizar').onclick = () => { if (uploadedImage) { uploadedImage.set({ selectable: false, hasControls: false }); }
 
     resizeCanvas(); // chamada inicial
   </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
