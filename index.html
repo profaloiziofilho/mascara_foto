@@ -19,8 +19,7 @@
       margin: auto;
     }
     canvas {
-      width: 100% !important;
-      height: auto !important;
+      border: 1px solid #ccc;
     }
     label {
       display: block;
@@ -51,11 +50,11 @@
     const canvas = new fabric.Canvas('canvas');
     let mask;
 
-    // Ajusta o canvas mantendo proporção 600x778
+    // Ajusta o canvas mantendo proporção 1080x1350
     function resizeCanvas() {
       const container = document.getElementById('canvas-container');
       const width = container.offsetWidth;
-      const height = Math.round(width * (1080 / 1350)); // proporção da máscara
+      const height = Math.round(width * (1080 / 1350));
 
       canvas.setWidth(width);
       canvas.setHeight(height);
@@ -63,7 +62,7 @@
       if (mask) {
         mask.scaleToWidth(canvas.width);
         mask.scaleToHeight(canvas.height);
-        canvas.centerObject(mask);
+        mask.set({ left: 0, top: 0 });
         canvas.renderAll();
       }
     }
@@ -74,6 +73,7 @@
     fabric.Image.fromURL('1000480796.png', function(img) {
       mask = img;
       mask.selectable = false;
+      mask.set({ opacity: 0.5 }); // semi-transparente para ajuste
       canvas.add(mask);
       resizeCanvas();
       canvas.bringToFront(mask);
@@ -92,14 +92,21 @@
             cornerSize: 30,
             transparentCorners: false
           });
-          img.scaleToWidth(canvas.width * 0.8);
 
-          // Recorte proporcional ao tamanho da máscara
+          // Ajusta proporcionalmente para caber dentro do canvas
+          img.scaleToWidth(canvas.width);
+          if (img.height * img.scaleY > canvas.height) {
+            img.scaleToHeight(canvas.height);
+          }
+
+          // ClipPath centralizado
           img.clipPath = new fabric.Rect({
-            left: 0,
-            top: 0,
+            left: canvas.width / 2,
+            top: canvas.height / 2,
             width: canvas.width,
             height: canvas.height,
+            originX: 'center',
+            originY: 'center',
             absolutePositioned: true
           });
 
@@ -112,23 +119,22 @@
 
     // Download da imagem final
     document.getElementById('download').onclick = () => {
+      if (mask) mask.set({ opacity: 1 }); // máscara opaca no resultado
+      canvas.renderAll();
+
       const link = document.createElement('a');
       link.download = 'foto_com_mascara.png';
       link.href = canvas.toDataURL({ 
         format: 'png', 
-        multiplier: 4 
-      }); // dobra a resolução
+        multiplier: 2 
+      });
       link.click();
+
+      if (mask) mask.set({ opacity: 0.5 }); // volta semi-transparente para edição
+      canvas.renderAll();
     };
 
     resizeCanvas(); // chamada inicial
   </script>
 </body>
 </html>
-
-
-
-
-
-
-
