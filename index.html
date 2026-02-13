@@ -60,13 +60,16 @@
       canvas.setHeight(height);
 
       if (mask) {
-  mask.scaleToWidth(canvas.width);
-  mask.scaleToHeight(canvas.height);
-  mask.set({ left: 0, top: 0 });
-  canvas.renderAll();
-}
-
-
+        mask.scaleToWidth(canvas.width);
+        mask.scaleToHeight(canvas.height);
+        mask.set({
+          originX: 'center',
+          originY: 'center',
+          left: canvas.width / 2,
+          top: canvas.height / 2
+        });
+        canvas.renderAll();
+      }
     }
 
     window.addEventListener('resize', resizeCanvas);
@@ -92,7 +95,11 @@
             hasControls: true,
             cornerColor: 'red',
             cornerSize: 30,
-            transparentCorners: false
+            transparentCorners: false,
+            originX: 'center',
+            originY: 'center',
+            left: canvas.width / 2,
+            top: canvas.height / 2
           });
 
           // Ajusta proporcionalmente para caber dentro do canvas
@@ -105,8 +112,8 @@
           img.clipPath = new fabric.Rect({
             left: canvas.width / 2,
             top: canvas.height / 2,
-            width: 1080px,
-            height: 1350px,
+            width: canvas.width,
+            height: canvas.height,
             originX: 'center',
             originY: 'center',
             absolutePositioned: true
@@ -140,6 +147,3 @@
   </script>
 </body>
 </html>
-
-
-
