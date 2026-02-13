@@ -60,11 +60,17 @@
       canvas.setHeight(height);
 
       if (mask) {
-        mask.scaleToWidth(canvas.width);
-        mask.scaleToHeight(canvas.height);
-        mask.set({ left: 0, top: 0 });
-        canvas.renderAll();
-      }
+  mask.scaleToWidth(canvas.width);
+  mask.scaleToHeight(canvas.height);
+  mask.set({
+    originX: 'center',
+    originY: 'center',
+    left: canvas.width / 2,
+    top: canvas.height / 2
+  });
+  canvas.renderAll();
+}
+
     }
 
     window.addEventListener('resize', resizeCanvas);
@@ -138,3 +144,4 @@
   </script>
 </body>
 </html>
+
