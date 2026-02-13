@@ -142,10 +142,16 @@
       if (mask) mask.set({ opacity: 0.5 }); // volta semi-transparente para edição
       canvas.renderAll();
     };
-
+// Evento: clicar fora da foto traz a máscara para frente 
+    canvas.on('mouse:down', function(e) { 
+      if (!e.target && mask) { 
+        canvas.bringToFront(mask); 
+    canvas.renderAll(); 
+      }
     resizeCanvas(); // chamada inicial
   </script>
 </body>
 </html>
+
 
 
